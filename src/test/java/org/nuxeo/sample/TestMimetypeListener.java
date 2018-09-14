@@ -66,17 +66,18 @@ public class TestMimetypeListener {
         assertTrue(events.stream().allMatch(listener::acceptEvent));
     }
 
-	@Test
+    @Test
     public void listenForBlobAttachment() {
         EventListenerDescriptor listener = s.getEventListener("mimetypelistener");
         assertNotNull(listener);
+
         Blob blob = Blobs.createBlob("Dummy txt", "text/plain", null, "dummy.txt");
-		DocumentModel doc = session.getDocument(new IdRef(docId));
+        DocumentModel doc = session.getDocument(new IdRef(docId));
         doc.setPropertyValue("file:content", (Serializable) blob);
         session.save();
+
         Blob blob2 = (Blob) doc.getPropertyValue("file:content");
         assertNotNull(blob2);
-
     }
 
 }
