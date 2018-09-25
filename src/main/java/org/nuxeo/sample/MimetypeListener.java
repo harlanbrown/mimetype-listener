@@ -18,7 +18,7 @@ public class MimetypeListener implements EventListener {
   
     private static final Log log = LogFactory.getLog(MimetypeListener.class);
 
-    protected final List<String> handled = Arrays.asList("emptyDocumentModelCreated", "aboutToCreate", "beforeDocumentModification");
+    protected final List<String> handled = Arrays.asList("emptyDocumentModelCreated", "aboutToCreate", "beforeDocumentModification", "documentModified");
 
     public void handleEvent(EventBundle events) {
         for (Event event : events) {
@@ -38,31 +38,34 @@ public class MimetypeListener implements EventListener {
         if (!(ctx instanceof DocumentEventContext)) {
           return;
         }
-        log.error("HELLO HELLO");
 
         DocumentEventContext docCtx = (DocumentEventContext) ctx;
         DocumentModel doc = docCtx.getSourceDocument();
         String mimeType = new String();
 
-        // Add some logic starting from here.
-
         try {
-            Blob blob = (Blob) doc.getPropertyValue("file:content");
-            mimeType = blob.getMimeType();
-        } catch (Exception e) {
+            if (doc.getType().contains("File")){
+                log.error(doc.getName()+" "+event.getName());
+                log.error(doc.toString());
+                Blob blob = (Blob) doc.getPropertyValue("file:content");
+                if (blob != null) {
+                    mimeType = blob.getMimeType();
+                    log.error(mimeType); 
+            //event.markRollBack();
+            //throw new RecoverableClientException("error","error",null);
+                }
+            } else {
+            }
+        } catch (RecoverableClientException e) {
+            log.error("caught exception");
         }
 
-        log.error(mimeType);
-
-        handleExcep(new RecoverableClientException("error","error",null), event);
-
     }
-    public void handleExcep(RecoverableClientException e, Event event){
-        String msg = "Current event " + event.getName() + " would break Quota restriction, rolling back";
-        log.error(msg);
-        log.info(msg);
-        e.addInfo(msg);
-        event.markRollBack("Quota Exceeded", e);
-    }
+//    public void handleExcep(RecoverableClientException e, Event event){
+    //public void handleExcep(Exception e, Event event){
+//        String msg = "Current event " + event.getName() + " does not match mimetype, rolling back";
+//        log.info(msg);
+        //e.addInfo(msg);
+    //}
 
 }
