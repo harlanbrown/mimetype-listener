@@ -38,8 +38,7 @@ public class TestMimetypeListener {
 
     private static final Log log = LogFactory.getLog(TestMimetypeListener.class);
 
-//    protected final List<String> events = Arrays.asList("emptyDocumentModelCreated", "aboutToCreate", "beforeDocumentModification");
-    protected final List<String> events = Arrays.asList("beforeDocumentModification");
+    protected final List<String> events = Arrays.asList("emptyDocumentModelCreated", "aboutToCreate", "beforeDocumentModification", "documentModified");
 
     @Inject
     protected CoreSession session;
@@ -73,11 +72,16 @@ public class TestMimetypeListener {
         assertNotNull(listener);
 
         DocumentModel doc = session.getDocument(new IdRef(docId));
-        Blob blob = Blobs.createBlob("Dummy txt", "text/plain", null, "dummy.txt");
+        //Blob blob = Blobs.createBlob("Dummy txt", "text/plain", null, "dummy.txt");
+        Blob blob = Blobs.createBlob("Dummy txt", "text/rtf", null, "dummy.txt");
+
         doc.setPropertyValue("file:content", (Serializable) blob);
+        session.saveDocument(doc);
         session.save();
-//        Blob blob2 = (Blob) doc.getPropertyValue("file:content");
-//        assertNotNull(blob2);
+
+        Blob blob2 = (Blob) doc.getPropertyValue("file:content");
+        assertNotNull(blob2);
     }
 
 }
+

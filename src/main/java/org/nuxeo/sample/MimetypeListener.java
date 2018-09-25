@@ -44,28 +44,22 @@ public class MimetypeListener implements EventListener {
         String mimeType = new String();
 
         try {
-            if (doc.getType().contains("File")){
-                log.error(doc.getName()+" "+event.getName());
-                log.error(doc.toString());
+            if (doc.getType().contains("File")){  // check document type
                 Blob blob = (Blob) doc.getPropertyValue("file:content");
                 if (blob != null) {
                     mimeType = blob.getMimeType();
-                    log.error(mimeType); 
-            //event.markRollBack();
-            //throw new RecoverableClientException("error","error",null);
+                    if (mimeType.contains("text/plain")){ // check mime type
+                        event.markRollBack();
+                        String msg = String.format("cannot update document with blob of mimetype %s",mimeType);
+                        throw new RecoverableClientException(msg, msg, null);
+                    }
                 }
-            } else {
             }
         } catch (RecoverableClientException e) {
             log.error("caught exception");
+            throw e;
         }
 
     }
-//    public void handleExcep(RecoverableClientException e, Event event){
-    //public void handleExcep(Exception e, Event event){
-//        String msg = "Current event " + event.getName() + " does not match mimetype, rolling back";
-//        log.info(msg);
-        //e.addInfo(msg);
-    //}
 
 }
